@@ -61,7 +61,7 @@ public class ServiceController {
 				repos.delete(sp);
 				return ResponseEntity.noContent().build();
 			})
-			.orElseGet(() -> ResponseEntity.notFound().build());
+			.orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).<Void>build());
 	}
 
 	@GetMapping("/{id}")
@@ -94,7 +94,7 @@ public class ServiceController {
 				ServiceProvider saved = repos.save(existingSp);
 				return ResponseEntity.ok(saved);
 			})
-			.orElseGet(() -> ResponseEntity.notFound().build());
+			.orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).<ServiceProvider>build());
 	}
 
 	/**

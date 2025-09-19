@@ -49,19 +49,19 @@ public class ServiceController {
 
 	@DeleteMapping("/{id}")
 	@PreAuthorize("hasRole('ADMIN') or hasRole('SERVICE_PROVIDER')")
-	public ResponseEntity<Void> deleteServiceProvider(@PathVariable int id, Authentication auth) {
+    public ResponseEntity<?> deleteServiceProvider(@PathVariable int id, Authentication auth) {
 		return repos.findById(id)
 			.map(sp -> {
 				Users current = usersRepo.findByEmail(auth.getName());
 				boolean isAdmin = current.getRole() != null && current.getRole().equalsIgnoreCase("ADMIN");
 				boolean isOwner = sp.getOwner() != null && sp.getOwner().getId() == current.getId();
                 if (!isAdmin && !isOwner) {
-                    return ResponseEntity.status(HttpStatus.FORBIDDEN).<Void>build();
+                    return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
                 }
 				repos.delete(sp);
 				return ResponseEntity.noContent().build();
 			})
-			.orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).<Void>build());
+            .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
 	}
 
 	@GetMapping("/{id}")

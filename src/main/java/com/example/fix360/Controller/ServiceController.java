@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -54,9 +55,9 @@ public class ServiceController {
 				Users current = usersRepo.findByEmail(auth.getName());
 				boolean isAdmin = current.getRole() != null && current.getRole().equalsIgnoreCase("ADMIN");
 				boolean isOwner = sp.getOwner() != null && sp.getOwner().getId() == current.getId();
-				if (!isAdmin && !isOwner) {
-					return ResponseEntity.status(403).build();
-				}
+                if (!isAdmin && !isOwner) {
+                    return ResponseEntity.status(HttpStatus.FORBIDDEN).<Void>build();
+                }
 				repos.delete(sp);
 				return ResponseEntity.noContent().build();
 			})
@@ -75,14 +76,14 @@ public class ServiceController {
 		return repos.findById(id)
 			.map(existingSp -> {
 				Users current = usersRepo.findByEmail(auth.getName());
-				if (current == null) {
-					return ResponseEntity.status(401).build();
-				}
+                if (current == null) {
+                    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).<ServiceProvider>build();
+                }
 				boolean isAdmin = current.getRole() != null && current.getRole().equalsIgnoreCase("ADMIN");
 				boolean isOwner = existingSp.getOwner() != null && existingSp.getOwner().getId() == current.getId();
-				if (!isAdmin && !isOwner) {
-					return ResponseEntity.status(403).build();
-				}
+                if (!isAdmin && !isOwner) {
+                    return ResponseEntity.status(HttpStatus.FORBIDDEN).<ServiceProvider>build();
+                }
 				if (updatedSp.getName() != null) existingSp.setName(updatedSp.getName());
 				if (updatedSp.getPhone() != null) existingSp.setPhone(updatedSp.getPhone());
 				if (updatedSp.getEmail() != null) existingSp.setEmail(updatedSp.getEmail());
